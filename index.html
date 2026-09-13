@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Modelo Predictivo Cuantitativo Avanzado</title>
+    <title>Modelo Cuantitativo Equilibrado</title>
     <style>
         :root {
             --bg-color: #0f172a;
@@ -149,7 +149,7 @@
 <body>
 
 <div class="container">
-    <h1>Analizador Cuantitativo y de Probabilidades</h1>
+    <h1>Analizador Cuantitativo Equilibrado</h1>
     
     <div class="card">
         <h3>1. Ingresar Atributos de los Equipos</h3>
@@ -158,43 +158,47 @@
             <div class="team-column">
                 <h4 class="local-title">Local (Verde)</h4>
                 <label>Rating General</label>
-                <input type="number" id="ratL" value="90">
+                <input type="number" id="ratL" value="75">
                 <label>Ataque</label>
-                <input type="number" id="atkL" value="79">
+                <input type="number" id="atkL" value="72">
                 <label>Mediocampo</label>
-                <input type="number" id="medL" value="74">
+                <input type="number" id="medL" value="70">
                 <label>Defensa</label>
-                <input type="number" id="defL" value="75">
+                <input type="number" id="defL" value="74">
                 <label>Porteros</label>
-                <input type="number" id="porL" value="67">
+                <input type="number" id="porL" value="73">
                 <label>Plantilla</label>
-                <input type="number" id="plaL" value="75">
+                <input type="number" id="plaL" value="72">
             </div>
             <!-- Visitante -->
             <div class="team-column">
                 <h4 class="visitor-title">Visitante (Azul)</h4>
                 <label>Rating General</label>
-                <input type="number" id="ratV" value="96">
+                <input type="number" id="ratV" value="74">
                 <label>Ataque</label>
-                <input type="number" id="atkV" value="85">
+                <input type="number" id="atkV" value="71">
                 <label>Mediocampo</label>
-                <input type="number" id="medV" value="79">
+                <input type="number" id="medV" value="69">
                 <label>Defensa</label>
-                <input type="number" id="defV" value="78">
+                <input type="number" id="defV" value="73">
                 <label>Porteros</label>
-                <input type="number" id="porV" value="82">
+                <input type="number" id="porV" value="72">
                 <label>Plantilla</label>
-                <input type="number" id="plaV" value="80">
+                <input type="number" id="plaV" value="71">
             </div>
         </div>
-        <button onclick="analizarPartido()">Ejecutar Modelo Predictivo</button>
+        <button onclick="analizarPartido()">Ejecutar Modelo Equilibrado</button>
     </div>
 
     <div class="card results-section" id="resultsCard">
         <h3>2. Proyección de Estadísticas Base</h3>
         <div class="stat-row">
-            <span>Goles Esperados (λ Poisson):</span>
-            <span id="resGoles" class="highlight-val">-</span>
+            <span>Marcador Estimado (Local - Visitante):</span>
+            <span id="resMarcador" class="highlight-val" style="font-size: 1.1rem; color: #4ade80;">-</span>
+        </div>
+        <div class="stat-row">
+            <span>Remates Totales (Local / Visitante):</span>
+            <span id="resRemTotales" class="highlight-val">-</span>
         </div>
         <div class="stat-row">
             <span>Remates al Arco (Local / Visitante):</span>
@@ -223,10 +227,8 @@
             <span id="resOver" class="highlight-val" style="font-size: 0.85rem;">-</span>
         </div>
 
-        <h3 style="margin-top: 15px;">4. Justificación y Desglose Táctico</h3>
-        <div class="breakdown-box" id="resDesglose">
-            <!-- Explicación detallada por mercado -->
-        </div>
+        <h3 style="margin-top: 15px;">4. Justificación Táctica</h3>
+        <div class="breakdown-box" id="resDesglose"></div>
     </div>
 </div>
 
@@ -243,41 +245,33 @@ function poissonProb(lambda, k) {
 }
 
 function analizarPartido() {
-    // Capturar entradas
-    const ratL = parseFloat(document.getElementById('ratL').value);
     const atkL = parseFloat(document.getElementById('atkL').value);
     const defL = parseFloat(document.getElementById('defL').value);
     const porL = parseFloat(document.getElementById('porL').value);
     const medL = parseFloat(document.getElementById('medL').value);
     const plaL = parseFloat(document.getElementById('plaL').value);
     
-    const ratV = parseFloat(document.getElementById('ratV').value);
     const atkV = parseFloat(document.getElementById('atkV').value);
     const defV = parseFloat(document.getElementById('defV').value);
     const porV = parseFloat(document.getElementById('porV').value);
     const medV = parseFloat(document.getElementById('medV').value);
     const plaV = parseFloat(document.getElementById('plaV').value);
 
-    // --- 1. MODELO DE POISON Y RESISTENCIA GLOBAL PARA GOLES ---
-    let resistenciaLocal = (defL * 0.6) + (porL * 0.4);
-    let resistenciaVisitante = (defV * 0.6) + (porV * 0.4);
+    // --- NUEVO MOTOR DE LÓGICA EQUILIBRADA (Acepta partidos cerrados / pocos remates) ---
+    
+    // Normalizamos con base 75 (promedio estándar real)
+    let fAtkL = atkL / 75, fDefL = defL / 75, fPorL = porL / 75, fMedL = medL / 75;
+    let fAtkV = atkV / 75, fDefV = defV / 75, fPorV = porV / 75, fMedV = medV / 75;
 
-    let factorPortL = 78 / porL;
-    let factorPortV = 78 / porV;
+    // 1. Goles (Poisson ajustado a la baja para partidos traba)
+    let lambdaLocal = (fAtkL / fDefV) * 1.08;
+    let lambdaVis = (fAtkV / fDefL) * 0.95;
+    lambdaLocal = Math.max(0.2, Math.min(lambdaLocal, 2.5));
+    lambdaVis = Math.max(0.2, Math.min(lambdaVis, 2.5));
 
-    let lambdaLocal = (atkL / resistenciaVisitante) * factorPortV * 1.25;
-    let lambdaVis = (atkV / resistenciaLocal) * factorPortL * 1.40;
-
-    if(lambdaLocal < 0.2) lambdaLocal = 0.3;
-    if(lambdaVis < 0.3) lambdaVis = 0.5;
-
-    // --- 2. PROBABILIDADES MATEMÁTICAS CON POISON (0 a 5 goles) ---
-    let probHomeWin = 0;
-    let probDraw = 0;
-    let probAwayWin = 0;
-    let probBtts = 0;
+    let probHomeWin = 0, probDraw = 0, probAwayWin = 0, probBtts = 0;
     let probTotalGoles = { o15: 0, o25: 0, o35: 0 };
-    let exactScores = [];
+    let maxProb = -1, bestH = 0, bestA = 0;
 
     for (let h = 0; h <= 5; h++) {
         for (let a = 0; a <= 5; a++) {
@@ -290,68 +284,76 @@ function analizarPartido() {
             if (h + a > 1.5) probTotalGoles.o15 += p;
             if (h + a > 2.5) probTotalGoles.o25 += p;
             if (h + a > 3.5) probTotalGoles.o35 += p;
+
+            if (p > maxProb) {
+                maxProb = p;
+                bestH = h;
+                bestA = a;
+            }
         }
     }
 
-    // --- 3. CRUCE AVANZADO DE REMATES AL ARCO ---
-    let remTotalLocal = 8 + (atkL / 10) + ((medL - medV) / 4);
-    let remTotalVis = 8 + (atkV / 10) + ((medV - medL) / 4);
-    if(remTotalLocal < 5) remTotalLocal = 5;
-    if(remTotalVis < 6) remTotalVis = 6;
+    // 2. Remates Totales (Base de partida baja: 8 remates, permitiendo partidos de pocos tiros)
+    let controlMedio = fMedL - fMedV; // Negativo si domina visitante, positivo si local
+    let remTotLocal = Math.round(9 + (fAtkL - 1) * 3 + controlMedio * 3);
+    let remTotVis = Math.round(9 + (fAtkV - 1) * 3 - controlMedio * 3);
+    
+    // Topes estrictos: permite bajar hasta 4 remates si el equipo es muy defensivo u ofensivamente nulo
+    remTotLocal = Math.max(4, Math.min(remTotLocal, 16));
+    remTotVis = Math.max(4, Math.min(remTotVis, 16));
 
-    let efecLocal = 0.35 + ((85 - porV) / 100);
-    let efecVis = 0.35 + ((85 - porL) / 100);
+    // 3. Remates al Arco (Proporción estricta de 30% a 35% de los remates totales)
+    let tirArcoLocal = Math.round(remTotLocal * (0.28 + (fAtkL - fPorV) * 0.05));
+    let tirArcoVis = Math.round(remTotVis * (0.28 + (fAtkV - fPorL) * 0.05));
+    
+    tirArcoLocal = Math.max(1, Math.min(tirArcoLocal, 7));
+    tirArcoVis = Math.max(1, Math.min(tirArcoVis, 7));
 
-    let tirArcoLocal = Math.max(2, Math.round(remTotalLocal * efecLocal));
-    let tirArcoVis = Math.max(3, Math.round(remTotalVis * efecVis));
-
-    // --- 4. CRUCE DE CÓRNERS (Presión Territorial) ---
-    let diffMed = medV - medL;
-    let corLocal = Math.max(2, Math.round(4.5 + (medL / 20) - (diffMed > 0 ? diffMed / 4 : -0.5) + ((80 - defV) / 10)));
-    let corVis = Math.max(3, Math.round(4.5 + (medV / 18) + (diffMed > 0 ? diffMed / 4 : -0.5) + ((80 - defL) / 10)));
+    // 4. Tiros de Esquina (Base baja: 3 córners por equipo, total realista de 6 a 10)
+    let corLocal = Math.round(3.5 + controlMedio * 2 + (fDefV - 1) * 1.5);
+    let corVis = Math.round(3.5 - controlMedio * 2 + (fDefL - 1) * 1.5);
+    
+    corLocal = Math.max(1, Math.min(corLocal, 7));
+    corVis = Math.max(1, Math.min(corVis, 7));
     let totalCorners = corLocal + corVis;
 
-    // --- 5. CRUCE DE TARJETAS AMARILLAS ---
-    let diffPlantilla = plaV - plaL;
-    let tarLocal = Math.max(1, Math.round(1.8 + (diffPlantilla > 0 ? diffPlantilla / 8 : 0) + ((atkV - defL) / 15)));
-    let tarVis = Math.max(1, Math.round(1.8 - (diffPlantilla > 0 ? diffPlantilla / 14 : 0) + ((atkL - defV) / 15)));
+    // 5. Tarjetas Amarillas (Base baja: 1.5 por equipo, total de 3 a 6)
+    let diffPlantilla = Math.abs(plaL - plaV);
+    let tarLocal = Math.round(1.5 + (diffPlantilla > 5 ? 1 : 0) + (fAtkV > fDefL ? 0.5 : 0));
+    let tarVis = Math.round(1.5 + (diffPlantilla > 5 ? 1 : 0) + (fAtkL > fDefV ? 0.5 : 0));
+    
+    tarLocal = Math.max(1, Math.min(tarLocal, 4));
+    tarVis = Math.max(1, Math.min(tarVis, 4));
     let totalTarjetas = tarLocal + tarVis;
 
-    // Mostrar resultados cuantitativos base
-    document.getElementById('resGoles').innerText = `${lambdaLocal.toFixed(2)} - ${lambdaVis.toFixed(2)}`;
-    document.getElementById('resTirArco').innerText = `${tirArcoLocal} vs ${tirArcoVis}`;
+    // Mostrar en Pantalla
+    document.getElementById('resMarcador').innerText = `${bestH} - ${bestA}  (Tasas: ${lambdaLocal.toFixed(2)} - ${lambdaVis.toFixed(2)})`;
+    document.getElementById('resRemTotales').innerText = `${remTotLocal} vs ${remTotVis} (Total: ~${remTotLocal + remTotVis})`;
+    document.getElementById('resTirArco').innerText = `${tirArcoLocal} vs ${tirArcoVis} (Total: ~${tirArcoLocal + tirArcoVis})`;
     document.getElementById('resCorners').innerText = `${corLocal} a ${corVis} (Total: ~${totalCorners})`;
     document.getElementById('resTarjetas').innerText = `${tarLocal} vs ${tarVis} (Total: ~${totalTarjetas})`;
 
-    // Mostrar probabilidades en porcentaje
     document.getElementById('res1X2').innerText = `${(probHomeWin*100).toFixed(1)}% | ${(probDraw*100).toFixed(1)}% | ${(probAwayWin*100).toFixed(1)}%`;
     document.getElementById('resBTTS').innerText = `${(probBtts*100).toFixed(1)}%`;
     document.getElementById('resOver').innerText = `+1.5: ${(probTotalGoles.o15*100).toFixed(1)}% | +2.5: ${(probTotalGoles.o25*100).toFixed(1)}% | +3.5: ${(probTotalGoles.o35*100).toFixed(1)}%`;
 
-    // --- 6. GENERADOR DE DESGLOSE Y JUSTIFICACIÓN TÁCTICA ---
-    let htmlDesglose = `
+    // Desglose Táctico
+    document.getElementById('resDesglose').innerHTML = `
         <div class="breakdown-item">
-            <h4>⚽ Por qué los Goles y el Marcador:</h4>
-            El modelo proyecta ${lambdaLocal.toFixed(2)} goles locales y ${lambdaVis.toFixed(2)} visitantes. Esto ocurre porque el ataque visitante de <b>${atkV}</b> se cruza con la resistencia mixta de la defensa local (<b>${defL}</b>) y su portero (<b>${porL}</b>). ${porL < 75 ? "Al tener el portero local una calificación baja, el riesgo de encajar goles se dispara exponencialmente ante cualquier disparo recibido." : "La solidez del guardameta contiene las llegadas."}
+            <h4>⚽ Lectura del Marcador:</h4>
+            Resultado proyectado: <b>${bestH} - ${bestA}</b>. El modelo parte de un estándar neutral y permite reflejar partidos cerrados, trabados o de marcador corto si las capacidades ofensivas son modestas.
         </div>
         <div class="breakdown-item">
-            <h4>🎯 Por qué los Remates al Arco:</h4>
-            Se estiman <b>${tirArcoLocal}</b> para el local y <b>${tirArcoVis}</b> para la visita. Se calculan combinando el volumen de ataque con el control de la zona medular, aplicando un multiplicador de eficiencia que premia los tiros directos cuando la defensa y el arquero rival muestran debilidades en el bloqueo.
+            <h4>🎯 Control de Remates:</h4>
+            Se proyectan <b>${remTotLocal + remTotVis} remates totales</b> y <b>${tirArcoLocal + tirArcoVis} al arco</b>. Al bajar la base inicial, los equipos con bajo ataque o mediocampos débiles ahora sí mostrarán pocos remates (incluso 4 o 5 tiros), evitando inflar las estadísticas artificialmente.
         </div>
         <div class="breakdown-item">
-            <h4>🚩 Por qué los Tiros de Esquina (Córners):</h4>
-            Se esperan <b>${totalCorners} córners totales</b> (${corLocal} a ${corVis}). Este valor se deriva directamente de la diferencia de mediocampo (<b>${medL} vs ${medV}</b>). ${medV > medL ? "El dominio territorial del visitante inclina la cancha hacia campo rival, obligando a despejar por línea de fondo." : "La paridad en la medular reparte las acciones en ambas áreas."}
-        </div>
-        <div class="breakdown-item">
-            <h4>🟨 Por qué las Tarjetas Amarillas:</h4>
-            Se proyectan <b>${totalTarjetas} tarjetas en total</b> (${tarLocal} local / ${tarVis} visitante). El motor calcula el estrés defensivo cruzando la brecha de plantilla (<b>${plaL} vs ${plaV}</b>) y la presión delantera. Las diferencias de nivel fuerzan al equipo inferior a recurrir a infracciones y faltas tácticas para cortar transiciones rápidas.
+            <h4>🚩 Córners y Tarjetas:</h4>
+            Se calculan <b>${totalCorners} córners</b> y <b>${totalTarjetas} tarjetas</b>. El sistema modula la presión para que los partidos flojos reflejen pocos saques de esquina y amonestaciones moderadas.
         </div>
     `;
 
-    document.getElementById('resDesglose').innerHTML = htmlDesglose;
-
-    // Hacer visible la sección de resultados
-    document.getElementById('resultsCard').style.display = 'block';
+    document.getElementById('resultsCard').style.display>='block' ? document.getElementById('resultsCard').style.display='block' : document.getElementById('resultsCard').style.display='block';
 }
 </script>
 
