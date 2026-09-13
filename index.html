@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Apex Quant Pro - Sports Trading Terminal</title>
+    <title>Apex Quant Pro - Enterprise Terminal</title>
     <style>
         :root {
-            --bg: #090d16;
-            --card: #131c31;
+            --bg: #070a12;
+            --card: #0f172a;
             --border: #1e293b;
             --accent: #38bdf8;
             --green: #22c55e;
@@ -21,41 +21,41 @@
             background-color: var(--bg);
             color: var(--text);
             margin: 0;
-            padding: 15px;
+            padding: 12px;
         }
         .container {
-            max-width: 700px;
+            max-width: 720px;
             margin: 0 auto;
         }
         header {
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
         header h1 {
-            font-size: 1.5rem;
+            font-size: 1.4rem;
             margin: 0;
-            background: linear-gradient(135deg, #38bdf8, #818cf8);
+            background: linear-gradient(135deg, #38bdf8, #a855f7);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
         header p {
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             color: var(--muted);
-            margin: 5px 0 0 0;
+            margin: 4px 0 0 0;
         }
         .card {
             background-color: var(--card);
             border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 15px;
-            margin-bottom: 15px;
-            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.5);
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 12px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
         }
         h3 {
             margin-top: 0;
-            font-size: 1rem;
+            font-size: 0.9rem;
             border-bottom: 1px solid var(--border);
-            padding-bottom: 8px;
+            padding-bottom: 6px;
             color: var(--accent);
             display: flex;
             justify-content: space-between;
@@ -64,90 +64,94 @@
         .grid-2 {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 12px;
+            gap: 10px;
         }
         .team-col h4 {
-            margin: 0 0 8px 0;
-            font-size: 0.9rem;
+            margin: 0 0 6px 0;
+            font-size: 0.85rem;
             text-align: center;
-            padding: 5px;
-            border-radius: 6px;
+            padding: 4px;
+            border-radius: 4px;
         }
-        .home-hdr { background: rgba(34, 197, 94, 0.1); color: var(--green); }
-        .away-hdr { background: rgba(59, 130, 246, 0.1); color: #60a5fa; }
+        .home-hdr { background: rgba(34, 197, 94, 0.12); color: var(--green); }
+        .away-hdr { background: rgba(59, 130, 246, 0.12); color: #60a5fa; }
         
         label {
             display: block;
-            font-size: 0.75rem;
+            font-size: 0.72rem;
             color: var(--muted);
-            margin-bottom: 3px;
+            margin-bottom: 2px;
         }
         input, select {
             width: 100%;
-            padding: 8px;
-            background-color: #090d16;
+            padding: 6px;
+            background-color: #070a12;
             border: 1px solid var(--border);
-            border-radius: 6px;
+            border-radius: 5px;
             color: white;
-            font-size: 0.85rem;
+            font-size: 0.82rem;
             box-sizing: border-box;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             text-align: center;
         }
         .btn-exec {
             width: 100%;
-            padding: 12px;
-            background: linear-gradient(135deg, #0284c7, #2563eb);
+            padding: 11px;
+            background: linear-gradient(135deg, #0284c7, #9333ea);
             color: white;
             border: none;
-            border-radius: 8px;
+            border-radius: 7px;
             font-weight: bold;
-            font-size: 1rem;
+            font-size: 0.95rem;
             cursor: pointer;
-            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
-            transition: transform 0.1s;
+            box-shadow: 0 4px 12px rgba(147, 51, 234, 0.3);
         }
         .btn-exec:active { transform: scale(0.98); }
         
         .results-section { display: none; }
-        .metric-row {
+        .prob-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 8px 0;
+            padding: 7px 0;
             border-bottom: 1px dashed var(--border);
-            font-size: 0.88rem;
+            font-size: 0.82rem;
         }
-        .metric-row:last-child { border-bottom: none; }
+        .prob-row:last-child { border-bottom: none; }
         .val-highlight { color: var(--accent); font-weight: bold; }
         
         .badge-value {
             background: rgba(34, 197, 94, 0.15);
             border: 1px solid var(--green);
             color: var(--green);
-            padding: 4px 8px;
-            border-radius: 6px;
+            padding: 2px 6px;
+            border-radius: 4px;
             font-weight: bold;
-            font-size: 0.8rem;
+            font-size: 0.72rem;
         }
         .badge-warning {
             background: rgba(239, 68, 68, 0.15);
             border: 1px solid var(--red);
             color: var(--red);
-            padding: 4px 8px;
-            border-radius: 6px;
+            padding: 2px 6px;
+            border-radius: 4px;
             font-weight: bold;
+            font-size: 0.72rem;
+        }
+        .market-box {
+            background: #070a12;
+            border: 1px solid var(--border);
+            padding: 8px 10px;
+            border-radius: 6px;
+            margin-top: 8px;
             font-size: 0.8rem;
         }
-        .terminal-box {
-            background-color: #090d16;
-            border-left: 4px solid var(--accent);
-            padding: 10px;
-            border-radius: 6px;
-            font-size: 0.82rem;
-            line-height: 1.4;
-            color: #cbd5e1;
-            margin-top: 10px;
+        .market-box h4 {
+            margin: 0 0 4px 0;
+            color: var(--yellow);
+            font-size: 0.84rem;
+            display: flex;
+            justify-content: space-between;
         }
     </style>
 </head>
@@ -156,16 +160,16 @@
 <div class="container">
     <header>
         <h1>APEX QUANT PRO</h1>
-        <p>Terminal Algorítmico de Apuestas Deportivas & Value Bets</p>
+        <p>Enterprise Monte Carlo Simulation & Value Engine</p>
     </header>
     
     <div class="card">
-        <h3>1. Matriz de Datos y Contexto</h3>
+        <h3>1. Matriz de Parámetros & Líneas de la Casa</h3>
         <div class="grid-2">
             <!-- Local -->
             <div class="team-col">
-                <h4 class="home-hdr">Equipo Local</h4>
-                <label>Ataque / xG Esperado (1-10)</label>
+                <h4 class="home-hdr">Local</h4>
+                <label>Ataque / xG (1-10)</label>
                 <input type="number" id="atkL" value="7.5" step="0.1" min="1" max="10">
                 <label>Defensa / xGA (1-10)</label>
                 <input type="number" id="defL" value="6.0" step="0.1" min="1" max="10">
@@ -176,12 +180,12 @@
                     <option value="directo">Contra / Bloque Bajo</option>
                 </select>
                 <label>Cuota Casa (1X2 Local)</label>
-                <input type="number" id="oddsL" value="2.10" step="0.01">
+                <input type="number" id="odds1X2" value="2.05" step="0.01">
             </div>
             <!-- Visitante -->
             <div class="team-col">
-                <h4 class="away-hdr">Equipo Visitante</h4>
-                <label>Ataque / xG Esperado (1-10)</label>
+                <h4 class="away-hdr">Visitante</h4>
+                <label>Ataque / xG (1-10)</label>
                 <input type="number" id="atkV" value="6.0" step="0.1" min="1" max="10">
                 <label>Defensa / xGA (1-10)</label>
                 <input type="number" id="defV" value="6.5" step="0.1" min="1" max="10">
@@ -191,113 +195,186 @@
                     <option value="posesion">Posesión / Control</option>
                     <option value="directo" selected>Contra / Bloque Bajo</option>
                 </select>
-                <label>Cuota Casa (1X2 Visitante)</label>
-                <input type="number" id="oddsV" value="3.50" step="0.01">
+                <label style="color:transparent;">Spacer</label>
+                <input type="hidden" value="0">
             </div>
         </div>
-        <button class="btn-exec" onclick="correrModeloPro()">EJECUTAR MOTOR CUANTITATIVO</button>
+
+        <div style="margin-top: 8px; border-top: 1px dashed var(--border); padding-top: 8px;">
+            <div class="grid-2">
+                <div>
+                    <label>Línea Remates Totales (Ej: 24.5)</label>
+                    <input type="number" id="lineaRemates" value="24.5" step="0.5">
+                </div>
+                <div>
+                    <label>Línea Córners (Ej: 9.5)</label>
+                    <input type="number" id="lineaCorners" value="9.5" step="0.5">
+                </div>
+            </div>
+            <div class="grid-2">
+                <div>
+                    <label>Línea Tarjetas (Ej: 4.5)</label>
+                    <input type="number" id="lineaTarjetas" value="4.5" step="0.5">
+                </div>
+                <div>
+                    <!-- Espacio libre simétrico -->
+                </div>
+            </div>
+        </div>
+
+        <button class="btn-exec" onclick="correrSimulacionMonteCarlo()">EJECUTAR 10,000 SIMULACIONES</button>
     </div>
 
     <div class="card results-section" id="resultsCard">
-        <h3>2. Proyecciones Avanzadas de Mercado</h3>
-        <div class="metric-row">
-            <span>Marcador Algorítmico Base:</span>
-            <span id="resScore" class="val-highlight" style="font-size: 1.05rem; color: var(--green);">-</span>
+        <h3>2. Resultados Estadísticos (Simulación Monte Carlo)</h3>
+        <div class="prob-row">
+            <span>Marcador Promedio Más Frecuente:</span>
+            <span id="resScore" class="val-highlight" style="color: var(--green);">-</span>
         </div>
-        <div class="metric-row">
-            <span>Remates al Arco Combinados:</span>
-            <span id="resRemates" class="val-highlight">-</span>
+        <div class="prob-row">
+            <span>Remates Totales Promedio:</span>
+            <span id="resRematesTotales" class="val-highlight">-</span>
         </div>
-        <div class="metric-row">
-            <span>Tiros de Esquina Totales:</span>
+        <div class="prob-row">
+            <span>Remates al Arco Promedio:</span>
+            <span id="resRematesArco" class="val-highlight">-</span>
+        </div>
+        <div class="prob-row">
+            <span>Córners Promedio:</span>
             <span id="resCorners" class="val-highlight">-</span>
         </div>
-        <div class="metric-row">
-            <span>Índice de Fricción (Tarjetas):</span>
+        <div class="prob-row">
+            <span>Tarjetas Promedio:</span>
             <span id="resTarjetas" class="val-highlight" style="color: var(--yellow);">-</span>
         </div>
 
-        <h3>3. 🧠 Auditoría de Valor (+EV) & Recomendación</h3>
-        <div class="metric-row">
-            <span>Análisis de Cuota Local:</span>
-            <span id="valAnalisisLocal">-</span>
+        <h3>3. 🎲 Matriz de Probabilidades & Auditoría de Valor (+EV)</h3>
+        
+        <div class="market-box">
+            <h4><span>Victoria Local (1X2)</span> <span id="prob1X2" style="color:var(--accent)">-</span></h4>
+            <div id="val1X2Txt"></div>
         </div>
-        <div class="terminal-box" id="terminalLog"></div>
+
+        <div class="market-box">
+            <h4><span>Mercado de Remates (Over Línea)</span> <span id="probRemates" style="color:var(--accent)">-</span></h4>
+            <div id="valRematesTxt"></div>
+        </div>
+
+        <div class="market-box">
+            <h4><span>Mercado de Córners (Over Línea)</span> <span id="probCorners" style="color:var(--accent)">-</span></h4>
+            <div id="valCornersTxt"></div>
+        </div>
+
+        <div class="market-box">
+            <h4><span>Mercado de Tarjetas (Over Línea)</span> <span id="probTarjetas" style="color:var(--accent)">-</span></h4>
+            <div id="valTarjetasTxt"></div>
+        </div>
     </div>
 </div>
 
 <script>
-function correrModeloPro() {
+function correrSimulacionMonteCarlo() {
     const atkL = parseFloat(document.getElementById('atkL').value);
     const defL = parseFloat(document.getElementById('defL').value);
     const estL = document.getElementById('estL').value;
-    const oddsL = parseFloat(document.getElementById('oddsL').value);
+    const odds1X2 = parseFloat(document.getElementById('odds1X2').value);
 
     const atkV = parseFloat(document.getElementById('atkV').value);
     const defV = parseFloat(document.getElementById('defV').value);
     const estV = document.getElementById('estV').value;
-    const oddsV = parseFloat(document.getElementById('oddsV').value);
 
-    // --- CÁLCULO DE TASAS REALES ---
-    let golesL = Math.max(0.3, (atkL / defV) * 1.15);
-    let golesV = Math.max(0.3, (atkV / defL) * 0.90);
+    const lineaRemates = parseFloat(document.getElementById('lineaRemates').value);
+    const lineaCorners = parseFloat(document.getElementById('lineaCorners').value);
+    const lineaTarjetas = parseFloat(document.getElementById('lineaTarjetas').value);
 
-    let estH = Math.round(golesL);
-    let estA = Math.round(golesV);
-    let totalGoles = estH + estA;
+    let lambdaL = Math.max(0.4, (atkL / defV) * 1.12);
+    let lambdaV = Math.max(0.4, (atkV / defL) * 0.92);
 
-    // Córners dinámicos por estilo de bandas
-    let baseCorners = 8.5;
-    if (estL === 'bandas') baseCorners += 2.0;
-    if (estV === 'bandas') baseCorners += 2.0;
-    if (estL === 'directo' && estV === 'directo') baseCorners -= 2.5;
-    baseCorners = Math.round(Math.max(6, Math.min(baseCorners, 13)));
-
-    // Remates al arco
-    let remates = Math.round(5 + (atkL + atkV) * 0.4);
-    remates = Math.max(3, Math.min(remates, 13));
-
-    // Tarjetas
-    let tarjetas = Math.round(3.2 + (Math.abs(atkL - atkV) > 2 ? 1.0 : 0) + (estL === 'directo' || estV === 'directo' ? 0.8 : 0));
-    tarjetas = Math.max(2, Math.min(tarjetas, 6));
-
-    // --- EVALUACIÓN DE VALUE BET (EV) ---
-    // Probabilidad implícita de la casa para el local: (1 / oddsL) * 100
-    let impliedProbL = (1 / oddsL) * 100;
+    let totalSims = 10000;
+    let winsL = 0, winsV = 0, draws = 0;
     
-    // Nuestra probabilidad estimada basada en la superioridad de xG
-    let diffAtk = atkL - atkV;
-    let modelProbL = 45 + (diffAtk * 6) + (estL === 'posesion' ? 5 : 0);
-    modelProbL = Math.max(15, Math.min(modelProbL, 85));
+    let sumRemates = 0, sumArco = 0, sumCorners = 0, sumTarjetas = 0;
+    
+    let targetRematesCount = 0;
+    let targetCornersCount = 0;
+    let targetTarjetasCount = 0;
 
-    let isValue = modelProbL > impliedProbL;
-    let badgeHtml = "";
+    let baseC = 8.5;
+    if (estL === 'bandas') baseC += 2.0;
+    if (estV === 'bandas') baseC += 2.0;
+    if (estL === 'directo' && estV === 'directo') baseC -= 1.8;
 
-    if (isValue) {
-        badgeHtml = `<span class="badge-value">¡VALUE DETECTADO (+EV)! (Modelo: ${modelProbL.toFixed(0)}% vs Casa: ${impliedProbL.toFixed(0)}%)</span>`;
-    } else {
-        badgeHtml = `<span class="badge-warning">SIN VALOR (Cuota Trampa / Margen Ajustado)</span>`;
+    let baseT = 3.6 + (Math.abs(atkL - atkV) > 2 ? 0.8 : 0);
+
+    for (let i = 0; i < totalSims; i++) {
+        let gL = Math.floor(Math.random() * (lambdaL * 1.8));
+        let gV = Math.floor(Math.random() * (lambdaV * 1.8));
+        
+        if (gL > gV) winsL++;
+        else if (gL === gV) draws++;
+        else winsV++;
+
+        let rem = 20 + Math.floor(Math.random() * 9) + (atkL + atkV - 13);
+        let arco = Math.round(rem * 0.36);
+        let cor = Math.max(4, Math.round(baseC + (Math.random() * 4 - 2)));
+        let tar = Math.max(1, Math.round(baseT + (Math.random() * 3 - 1.5)));
+
+        sumRemates += rem;
+        sumArco += arco;
+        sumCorners += cor;
+        sumTarjetas += tar;
+
+        if (rem > lineaRemates) targetRematesCount++;
+        if (cor > lineaCorners) targetCornersCount++;
+        if (tar > lineaTarjetas) targetTarjetasCount++;
     }
 
+    let probL = (winsL / totalSims) * 100;
+    let probRemates = (targetRematesCount / totalSims) * 100;
+    let probCorners = (targetCornersCount / totalSims) * 100;
+    let probTarjetas = (targetTarjetasCount / totalSims) * 100;
+
+    let avgRemates = (sumRemates / totalSims).toFixed(1);
+    let avgArco = Math.round(sumArco / totalSims);
+    let avgCorners = (sumCorners / totalSims).toFixed(1);
+    let avgTarjetas = (sumTarjetas / totalSims).toFixed(1);
+
+    let bestH = Math.round(lambdaL);
+    let bestA = Math.round(lambdaV);
+
+    let implied1X2 = (1 / odds1X2) * 100;
+    let isValue1X2 = probL > implied1X2;
+
     // Mostrar en Pantalla
-    document.getElementById('resScore').innerText = `${estH} - ${estA} (Goles Totales: ~${totalGoles})`;
-    document.getElementById('resRemates').innerText = `~${remates} tiros directos a puerta`;
-    document.getElementById('resCorners').innerText = `~${baseCorners} saques de esquina`;
-    document.getElementById('resTarjetas').innerText = `~${tarjetas} amonestaciones`;
+    document.getElementById('resScore').innerText = `${bestH} - ${bestA} (Modelo Estocástico)`;
+    document.getElementById('resRematesTotales').innerText = `~${avgRemates} remates totales`;
+    document.getElementById('resRematesArco').innerText = `~${avgArco} tiros al arco`;
+    document.getElementById('resCorners').innerText = `~${avgCorners} córners promedio`;
+    document.getElementById('resTarjetas').innerText = `~${avgTarjetas} tarjetas promedio`;
 
-    document.getElementById('valAnalisisLocal').innerHTML = badgeHtml;
+    // 1X2 Card
+    document.getElementById('prob1X2').innerText = `${probL.toFixed(1)}% Probabilidad`;
+    document.getElementById('val1X2Txt').innerHTML = isValue1X2 ?
+        `<span class="badge-value">¡VALUE BET DETECTADO! (+EV)</span> Cuota implícita: ${implied1X2.toFixed(1)}% (Cuota: ${odds1X2}).` :
+        `<span class="badge-warning">SIN VALOR MATEMÁTICO</span> Cuota implícita: ${implied1X2.toFixed(1)}%.`;
 
-    // Reporte de Terminal IA
-    let recomendacionMercado = totalGoles >= 3 ? "Más de 1.5 Goles / BTTS Recomendado." : "Bajas de Goles o Partido Cerrado.";
-    let recomendacionCorners = baseCorners >= 10 ? `Línea alta de Córners (Buscar +8.5)` : `Línea baja de Córners (Evitar overs altos)`;
+    // Remates Card
+    document.getElementById('probRemates').innerText = `${probRemates.toFixed(1)}% Probabilidad Over ${lineaRemates}`;
+    document.getElementById('valRematesTxt').innerHTML = probRemates > 52 ? 
+        `<span class="badge-value">¡Oportunidad Over Remates (+EV)!</span>` : 
+        `<span class="badge-warning">Baja probabilidad para esta línea</span>`;
 
-    document.getElementById('terminalLog').innerHTML = `
-        <b>📊 Diagnóstico Táctico Apex Quant:</b><br>
-        • <b>Tendencia de Goles:</b> ${recomendacionMercado}<br>
-        • <b>Tendencia de Córners:</b> ${recomendacionCorners}<br>
-        • <b>Nivel de Fricción:</b> ${tarjetas >= 4.5 ? "Alta probabilidad de partido caliente (Tarjetas+)." : "Partido limpio / controlado."}<br>
-        • <i>Conclusión Financiera:</i> ${isValue ? "El mercado subestima al local según nuestros coeficientes de xG. Apuesta viable." : "El precio de la cuota no compensa el riesgo estadístico. Es mejor pasar."}
-    `;
+    // Córners Card
+    document.getElementById('probCorners').innerText = `${probCorners.toFixed(1)}% Probabilidad Over ${lineaCorners}`;
+    document.getElementById('valCornersTxt').innerHTML = probCorners > 52 ? 
+        `<span class="badge-value">¡Oportunidad Over Córners (+EV)!</span>` : 
+        `<span class="badge-warning">Baja probabilidad para esta línea</span>`;
+
+    // Tarjetas Card
+    document.getElementById('probTarjetas').innerText = `${probTarjetas.toFixed(1)}% Probabilidad Over ${lineaTarjetas}`;
+    document.getElementById('valTarjetasTxt').innerHTML = probTarjetas > 52 ? 
+        `<span class="badge-value">¡Oportunidad Over Tarjetas (+EV)!</span>` : 
+        `<span class="badge-warning">Línea de tarjetas no recomendada</span>`;
 
     document.getElementById('resultsCard').style.display = 'block';
 }
