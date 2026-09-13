@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modelo Predictivo Cuantitativo Avanzado</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-color: #f8fafc;
+            --accent-local: #22c55e;
+            --accent-visitor: #3b82f6;
+            --border-color: #334155;
+            --yellow-card: #facc15;
+            --prob-color: #38bdf8;
+        }
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 15px;
+        }
+        .container {
+            max-width: 680px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            font-size: 1.35rem;
+            margin-bottom: 20px;
+            color: var(--prob-color);
+        }
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+        h3 {
+            margin-top: 0;
+            font-size: 1.05rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 8px;
+            color: #e2e8f0;
+        }
+        .grid-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+        .team-column h4 {
+            margin: 0 0 8px 0;
+            font-size: 0.95rem;
+            text-align: center;
+            padding: 4px;
+            border-radius: 6px;
+        }
+        .local-title { color: var(--accent-local); background: rgba(34, 197, 94, 0.1); }
+        .visitor-title { color: var(--accent-visitor); background: rgba(59, 130, 246, 0.1); }
+        
+        label {
+            display: block;
+            font-size: 0.78rem;
+            color: #94a3b8;
+            margin-bottom: 2px;
+        }
+        input {
+            width: 100%;
+            padding: 8px;
+            background-color: #0f172a;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: white;
+            font-size: 0.9rem;
+            box-sizing: border-box;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-top: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        button:active {
+            transform: scale(0.98);
+        }
+        .results-section {
+            display: none;
+        }
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 9px 0;
+            border-bottom: 1px dashed var(--border-color);
+            font-size: 0.9rem;
+        }
+        .stat-row:last-child {
+            border-bottom: none;
+        }
+        .highlight-val {
+            color: var(--prob-color);
+            font-weight: bold;
+        }
+        .prob-badge {
+            background-color: #0f172a;
+            border: 1px solid var(--border-color);
+            padding: 2px 8px;
+            border-radius: 4px;
+            color: #4ade80;
+            font-weight: bold;
+        }
+        .breakdown-box {
+            background-color: #0f172a;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            line-height: 1.5;
+            color: #cbd5e1;
+            border-left: 4px solid var(--prob-color);
+            margin-top: 10px;
+        }
+        .breakdown-box h4 {
+            margin: 0 0 6px 0;
+            color: #38bdf8;
+            font-size: 0.9rem;
+        }
+        .breakdown-item {
+            margin-bottom: 8px;
+        }
+        .breakdown-item:last-child {
+            margin-bottom: 0;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Analizador Cuantitativo y de Probabilidades</h1>
+    
+    <div class="card">
+        <h3>1. Ingresar Atributos de los Equipos</h3>
+        <div class="grid-inputs">
+            <!-- Local -->
+            <div class="team-column">
+                <h4 class="local-title">Local (Verde)</h4>
+                <label>Rating General</label>
+                <input type="number" id="ratL" value="90">
+                <label>Ataque</label>
+                <input type="number" id="atkL" value="79">
+                <label>Mediocampo</label>
+                <input type="number" id="medL" value="74">
+                <label>Defensa</label>
+                <input type="number" id="defL" value="75">
+                <label>Porteros</label>
+                <input type="number" id="porL" value="67">
+                <label>Plantilla</label>
+                <input type="number" id="plaL" value="75">
+            </div>
+            <!-- Visitante -->
+            <div class="team-column">
+                <h4 class="visitor-title">Visitante (Azul)</h4>
+                <label>Rating General</label>
+                <input type="number" id="ratV" value="96">
+                <label>Ataque</label>
+                <input type="number" id="atkV" value="85">
+                <label>Mediocampo</label>
+                <input type="number" id="medV" value="79">
+                <label>Defensa</label>
+                <input type="number" id="defV" value="78">
+                <label>Porteros</label>
+                <input type="number" id="porV" value="82">
+                <label>Plantilla</label>
+                <input type="number" id="plaV" value="80">
+            </div>
+        </div>
+        <button onclick="analizarPartido()">Ejecutar Modelo Predictivo</button>
+    </div>
+
+    <div class="card results-section" id="resultsCard">
+        <h3>2. Proyección de Estadísticas Base</h3>
+        <div class="stat-row">
+            <span>Goles Esperados (λ Poisson):</span>
+            <span id="resGoles" class="highlight-val">-</span>
+        </div>
+        <div class="stat-row">
+            <span>Remates al Arco (Local / Visitante):</span>
+            <span id="resTirArco" class="highlight-val">-</span>
+        </div>
+        <div class="stat-row">
+            <span>Tiros de Esquina (Córners Totales):</span>
+            <span id="resCorners" class="highlight-val">-</span>
+        </div>
+        <div class="stat-row">
+            <span>Tarjetas Amarillas (Local / Vis):</span>
+            <span id="resTarjetas" style="color: var(--yellow-card); font-weight: bold;">-</span>
+        </div>
+
+        <h3 style="margin-top: 15px;">3. Probabilidades Matemáticas (%)</h3>
+        <div class="stat-row">
+            <span>Victoria Local / Empate / Victoria Vis:</span>
+            <span id="res1X2" class="prob-badge">-</span>
+        </div>
+        <div class="stat-row">
+            <span>Probabilidad Ambos Anotan (BTTS):</span>
+            <span id="resBTTS" class="highlight-val">-</span>
+        </div>
+        <div class="stat-row">
+            <span>Goles Más de (Over 1.5 / 2.5 / 3.5):</span>
+            <span id="resOver" class="highlight-val" style="font-size: 0.85rem;">-</span>
+        </div>
+
+        <h3 style="margin-top: 15px;">4. Justificación y Desglose Táctico</h3>
+        <div class="breakdown-box" id="resDesglose">
+            <!-- Explicación detallada por mercado -->
+        </div>
+    </div>
+</div>
+
+<script>
+function factorial(n) {
+    if (n === 0 || n === 1) return 1;
+    let acc = 1;
+    for (let i = 2; i <= n; i++) acc *= i;
+    return acc;
+}
+
+function poissonProb(lambda, k) {
+    return (Math.pow(lambda, k) * Math.exp(-lambda)) / factorial(k);
+}
+
+function analizarPartido() {
+    // Capturar entradas
+    const ratL = parseFloat(document.getElementById('ratL').value);
+    const atkL = parseFloat(document.getElementById('atkL').value);
+    const defL = parseFloat(document.getElementById('defL').value);
+    const porL = parseFloat(document.getElementById('porL').value);
+    const medL = parseFloat(document.getElementById('medL').value);
+    const plaL = parseFloat(document.getElementById('plaL').value);
+    
+    const ratV = parseFloat(document.getElementById('ratV').value);
+    const atkV = parseFloat(document.getElementById('atkV').value);
+    const defV = parseFloat(document.getElementById('defV').value);
+    const porV = parseFloat(document.getElementById('porV').value);
+    const medV = parseFloat(document.getElementById('medV').value);
+    const plaV = parseFloat(document.getElementById('plaV').value);
+
+    // --- 1. MODELO DE POISON Y RESISTENCIA GLOBAL PARA GOLES ---
+    let resistenciaLocal = (defL * 0.6) + (porL * 0.4);
+    let resistenciaVisitante = (defV * 0.6) + (porV * 0.4);
+
+    let factorPortL = 78 / porL;
+    let factorPortV = 78 / porV;
+
+    let lambdaLocal = (atkL / resistenciaVisitante) * factorPortV * 1.25;
+    let lambdaVis = (atkV / resistenciaLocal) * factorPortL * 1.40;
+
+    if(lambdaLocal < 0.2) lambdaLocal = 0.3;
+    if(lambdaVis < 0.3) lambdaVis = 0.5;
+
+    // --- 2. PROBABILIDADES MATEMÁTICAS CON POISON (0 a 5 goles) ---
+    let probHomeWin = 0;
+    let probDraw = 0;
+    let probAwayWin = 0;
+    let probBtts = 0;
+    let probTotalGoles = { o15: 0, o25: 0, o35: 0 };
+    let exactScores = [];
+
+    for (let h = 0; h <= 5; h++) {
+        for (let a = 0; a <= 5; a++) {
+            let p = poissonProb(lambdaLocal, h) * poissonProb(lambdaVis, a);
+            if (h > a) probHomeWin += p;
+            else if (h === a) probDraw += p;
+            else probAwayWin += p;
+
+            if (h > 0 && a > 0) probBtts += p;
+            if (h + a > 1.5) probTotalGoles.o15 += p;
+            if (h + a > 2.5) probTotalGoles.o25 += p;
+            if (h + a > 3.5) probTotalGoles.o35 += p;
+        }
+    }
+
+    // --- 3. CRUCE AVANZADO DE REMATES AL ARCO ---
+    let remTotalLocal = 8 + (atkL / 10) + ((medL - medV) / 4);
+    let remTotalVis = 8 + (atkV / 10) + ((medV - medL) / 4);
+    if(remTotalLocal < 5) remTotalLocal = 5;
+    if(remTotalVis < 6) remTotalVis = 6;
+
+    let efecLocal = 0.35 + ((85 - porV) / 100);
+    let efecVis = 0.35 + ((85 - porL) / 100);
+
+    let tirArcoLocal = Math.max(2, Math.round(remTotalLocal * efecLocal));
+    let tirArcoVis = Math.max(3, Math.round(remTotalVis * efecVis));
+
+    // --- 4. CRUCE DE CÓRNERS (Presión Territorial) ---
+    let diffMed = medV - medL;
+    let corLocal = Math.max(2, Math.round(4.5 + (medL / 20) - (diffMed > 0 ? diffMed / 4 : -0.5) + ((80 - defV) / 10)));
+    let corVis = Math.max(3, Math.round(4.5 + (medV / 18) + (diffMed > 0 ? diffMed / 4 : -0.5) + ((80 - defL) / 10)));
+    let totalCorners = corLocal + corVis;
+
+    // --- 5. CRUCE DE TARJETAS AMARILLAS ---
+    let diffPlantilla = plaV - plaL;
+    let tarLocal = Math.max(1, Math.round(1.8 + (diffPlantilla > 0 ? diffPlantilla / 8 : 0) + ((atkV - defL) / 15)));
+    let tarVis = Math.max(1, Math.round(1.8 - (diffPlantilla > 0 ? diffPlantilla / 14 : 0) + ((atkL - defV) / 15)));
+    let totalTarjetas = tarLocal + tarVis;
+
+    // Mostrar resultados cuantitativos base
+    document.getElementById('resGoles').innerText = `${lambdaLocal.toFixed(2)} - ${lambdaVis.toFixed(2)}`;
+    document.getElementById('resTirArco').innerText = `${tirArcoLocal} vs ${tirArcoVis}`;
+    document.getElementById('resCorners').innerText = `${corLocal} a ${corVis} (Total: ~${totalCorners})`;
+    document.getElementById('resTarjetas').innerText = `${tarLocal} vs ${tarVis} (Total: ~${totalTarjetas})`;
+
+    // Mostrar probabilidades en porcentaje
+    document.getElementById('res1X2').innerText = `${(probHomeWin*100).toFixed(1)}% | ${(probDraw*100).toFixed(1)}% | ${(probAwayWin*100).toFixed(1)}%`;
+    document.getElementById('resBTTS').innerText = `${(probBtts*100).toFixed(1)}%`;
+    document.getElementById('resOver').innerText = `+1.5: ${(probTotalGoles.o15*100).toFixed(1)}% | +2.5: ${(probTotalGoles.o25*100).toFixed(1)}% | +3.5: ${(probTotalGoles.o35*100).toFixed(1)}%`;
+
+    // --- 6. GENERADOR DE DESGLOSE Y JUSTIFICACIÓN TÁCTICA ---
+    let htmlDesglose = `
+        <div class="breakdown-item">
+            <h4>⚽ Por qué los Goles y el Marcador:</h4>
+            El modelo proyecta ${lambdaLocal.toFixed(2)} goles locales y ${lambdaVis.toFixed(2)} visitantes. Esto ocurre porque el ataque visitante de <b>${atkV}</b> se cruza con la resistencia mixta de la defensa local (<b>${defL}</b>) y su portero (<b>${porL}</b>). ${porL < 75 ? "Al tener el portero local una calificación baja, el riesgo de encajar goles se dispara exponencialmente ante cualquier disparo recibido." : "La solidez del guardameta contiene las llegadas."}
+        </div>
+        <div class="breakdown-item">
+            <h4>🎯 Por qué los Remates al Arco:</h4>
+            Se estiman <b>${tirArcoLocal}</b> para el local y <b>${tirArcoVis}</b> para la visita. Se calculan combinando el volumen de ataque con el control de la zona medular, aplicando un multiplicador de eficiencia que premia los tiros directos cuando la defensa y el arquero rival muestran debilidades en el bloqueo.
+        </div>
+        <div class="breakdown-item">
+            <h4>🚩 Por qué los Tiros de Esquina (Córners):</h4>
+            Se esperan <b>${totalCorners} córners totales</b> (${corLocal} a ${corVis}). Este valor se deriva directamente de la diferencia de mediocampo (<b>${medL} vs ${medV}</b>). ${medV > medL ? "El dominio territorial del visitante inclina la cancha hacia campo rival, obligando a despejar por línea de fondo." : "La paridad en la medular reparte las acciones en ambas áreas."}
+        </div>
+        <div class="breakdown-item">
+            <h4>🟨 Por qué las Tarjetas Amarillas:</h4>
+            Se proyectan <b>${totalTarjetas} tarjetas en total</b> (${tarLocal} local / ${tarVis} visitante). El motor calcula el estrés defensivo cruzando la brecha de plantilla (<b>${plaL} vs ${plaV}</b>) y la presión delantera. Las diferencias de nivel fuerzan al equipo inferior a recurrir a infracciones y faltas tácticas para cortar transiciones rápidas.
+        </div>
+    `;
+
+    document.getElementById('resDesglose').innerHTML = htmlDesglose;
+
+    // Hacer visible la sección de resultados
+    document.getElementById('resultsCard').style.display = 'block';
+}
+</script>
+
+</body>
+</html>
