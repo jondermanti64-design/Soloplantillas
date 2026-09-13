@@ -153,6 +153,24 @@
             display: flex;
             justify-content: space-between;
         }
+        .breakdown-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-top: 6px;
+            background: rgba(255,255,255,0.02);
+            padding: 6px;
+            border-radius: 6px;
+            font-size: 0.78rem;
+        }
+        .breakdown-item span {
+            display: block;
+            color: var(--muted);
+            font-size: 0.7rem;
+        }
+        .breakdown-item strong {
+            color: var(--text);
+        }
     </style>
 </head>
 <body>
@@ -224,26 +242,50 @@
     </div>
 
     <div class="card results-section" id="resultsCard">
-        <h3>3. Resultados Estadísticos (Simulación Monte Carlo)</h3>
+        <h3>3. Resultados Estadísticos & Desglose por Equipo</h3>
         <div class="prob-row">
             <span>Marcador Promedio Más Frecuente:</span>
             <span id="resScore" class="val-highlight" style="color: var(--green);">-</span>
         </div>
-        <div class="prob-row">
-            <span>Remates Totales Promedio:</span>
-            <span id="resRematesTotales" class="val-highlight">-</span>
+        
+        <!-- Desglose detallado por equipo -->
+        <div class="breakdown-grid">
+            <div class="breakdown-item">
+                <span>🏠 Remates Esperados (Local):</span>
+                <strong id="resRemLocal" style="color:var(--green)">-</strong>
+            </div>
+            <div class="breakdown-item">
+                <span>✈️ Remates Esperados (Visita):</span>
+                <strong id="resRemVisita" style="color:#60a5fa">-</strong>
+            </div>
+            <div class="breakdown-item">
+                <span>🎯 Tiros al Arco (Local):</span>
+                <strong id="resArcoLocal" style="color:var(--green)">-</strong>
+            </div>
+            <div class="breakdown-item">
+                <span>🎯 Tiros al Arco (Visita):</span>
+                <strong id="resArcoVisita" style="color:#60a5fa">-</strong>
+            </div>
+            <div class="breakdown-item">
+                <span>🚩 Córners Esperados (Local):</span>
+                <strong id="resCorLocal" style="color:var(--green)">-</strong>
+            </div>
+            <div class="breakdown-item">
+                <span>🚩 Córners Esperados (Visita):</span>
+                <strong id="resCorVisita" style="color:#60a5fa">-</strong>
+            </div>
+            <div class="breakdown-item">
+                <span>🟨 Tarjetas Esperadas (Local):</span>
+                <strong id="resTarLocal" style="color:var(--yellow)">-</strong>
+            </div>
+            <div class="breakdown-item">
+                <span>🟨 Tarjetas Esperadas (Visita):</span>
+                <strong id="resTarVisita" style="color:var(--yellow)">-</strong>
+            </div>
         </div>
-        <div class="prob-row">
-            <span>Remates al Arco Promedio:</span>
-            <span id="resRematesArco" class="val-highlight">-</span>
-        </div>
-        <div class="prob-row">
-            <span>Córners Promedio:</span>
-            <span id="resCorners" class="val-highlight">-</span>
-        </div>
-        <div class="prob-row">
-            <span>Tarjetas Promedio:</span>
-            <span id="resTarjetas" class="val-highlight" style="color: var(--yellow);">-</span>
+
+        <div style="margin-top: 8px; font-size: 0.75px; color: var(--muted); text-align: center;">
+            Totales globales: <span id="resTotalesGlobales" style="color:var(--accent)">-</span>
         </div>
 
         <h3>4. 🎲 Matriz de Probabilidades & Auditoría de Valor (+EV)</h3>
@@ -291,26 +333,42 @@ function correrSimulacionMonteCarlo() {
     const lineaCorners = parseFloat(document.getElementById('lineaCorners').value) || 9.5;
     const lineaTarjetas = parseFloat(document.getElementById('lineaTarjetas').value) || 4.5;
 
+    // Tasas de Poisson para goles basadas estrictamente en xG y xGA
     let lambdaL = Math.max(0.4, (atkL / defV) * 1.12);
     let lambdaV = Math.max(0.4, (atkV / defL) * 0.92);
 
     let totalSims = 10000;
     let winsL = 0, winsV = 0, draws = 0;
     
-    let sumRemates = 0, sumArco = 0, sumCorners = 0, sumTarjetas = 0;
-    
-    let targetRematesCount = 0;
-    let targetCornersCount = 0;
-    let targetTarjetasCount = 0;
+    let sumRemL = 0, sumRemV = 0;
+    let sumArcoL = 0, sumArcoV = 0;
+    let sumCorL = 0, sumCorV = 0;
+    let sumTarL = 0, sumTarV = 0;
 
-    let baseC = 8.5;
-    if (estL === 'bandas') baseC += 2.0;
-    if (estV === 'bandas') baseC += 2.0;
-    if (estL === 'directo' && estV === 'directo') baseC -= 1.8;
+    let targetRematesCount = 0, targetCornersCount = 0, targetTarjetasCount = 0;
 
-    let baseT = 3.6 + (Math.abs(atkL - atkV) > 2 ? 0.8 : 0);
+    // BASES DE CÁLCULO SEPARADAS POR EQUIPO
+    let rematesBaseL = (atkL * 2.2) + (10 - defV) * 0.8;
+    let rematesBaseV = (atkV * 2.2) + (10 - defL) * 0.8;
+
+    // Modificadores tácticos específicos de Córners por equipo
+    let corBaseL = 3.5;
+    if (estL === 'bandas') corBaseL += 2.5;
+    if (estL === 'posesion') corBaseL += 1.2;
+    if (estL === 'directo') corBaseL -= 0.5;
+
+    let corBaseV = 3.0;
+    if (estV === 'bandas') corBaseV += 2.5;
+    if (estV === 'posesion') corBaseV += 1.2;
+    if (estV === 'directo') corBaseV -= 0.5;
+
+    // Tarjetas por fricción y bloques bajos por equipo
+    let diferenciaNivel = Math.abs(atkL - atkV);
+    let tarBaseL = 1.2 + (estL === 'directo' ? 0.8 : 0);
+    let tarBaseV = 1.4 + (estV === 'directo' ? 0.8 : 0) + (diferenciaNivel * 0.2); // El equipo inferior suele hacer más faltas tácticas
 
     for (let i = 0; i < totalSims; i++) {
+        // Goles (Poisson)
         let gL = Math.floor(Math.random() * (lambdaL * 1.8));
         let gV = Math.floor(Math.random() * (lambdaV * 1.8));
         
@@ -318,19 +376,33 @@ function correrSimulacionMonteCarlo() {
         else if (gL === gV) draws++;
         else winsV++;
 
-        let rem = 20 + Math.floor(Math.random() * 9) + (atkL + atkV - 13);
-        let arco = Math.round(rem * 0.36);
-        let cor = Math.max(4, Math.round(baseC + (Math.random() * 4 - 2)));
-        let tar = Math.max(1, Math.round(baseT + (Math.random() * 3 - 1.5)));
+        // Remates Individuales Estocásticos
+        let remL = Math.max(3, Math.round(rematesBaseL + (Math.random() * 6 - 3)));
+        let remV = Math.max(2, Math.round(rematesBaseV + (Math.random() * 6 - 3)));
+        let remTotales = remL + remV;
 
-        sumRemates += rem;
-        sumArco += arco;
-        sumCorners += cor;
-        sumTarjetas += tar;
+        // Tiros al arco individuales proporcionales
+        let arcoL = Math.max(1, Math.round(remL * (0.32 + (atkL * 0.01))));
+        let arcoV = Math.max(1, Math.round(remV * (0.32 + (atkV * 0.01))));
 
-        if (rem > lineaRemates) targetRematesCount++;
-        if (cor > lineaCorners) targetCornersCount++;
-        if (tar > lineaTarjetas) targetTarjetasCount++;
+        // Córners individuales
+        let corL = Math.max(1, Math.round(corBaseL + (atkL * 0.3) + (Math.random() * 4 - 2)));
+        let corV = Math.max(1, Math.round(corBaseV + (atkV * 0.3) + (Math.random() * 4 - 2)));
+        let corTotales = corL + corV;
+
+        // Tarjetas individuales
+        let tarL = Math.max(0, Math.round(tarBaseL + (Math.random() * 3 - 1.5)));
+        let tarV = Math.max(0, Math.round(tarBaseV + (Math.random() * 3 - 1.5)));
+        let tarTotales = tarL + tarV;
+
+        sumRemL += remL; sumRemV += remV;
+        sumArcoL += arcoL; sumArcoV += arcoV;
+        sumCorL += corL; sumCorV += corV;
+        sumTarL += tarL; sumTarV += tarV;
+
+        if (remTotales > lineaRemates) targetRematesCount++;
+        if (corTotales > lineaCorners) targetCornersCount++;
+        if (tarTotales > lineaTarjetas) targetTarjetasCount++;
     }
 
     let probL = (winsL / totalSims) * 100;
@@ -339,10 +411,15 @@ function correrSimulacionMonteCarlo() {
     let probCorners = (targetCornersCount / totalSims) * 100;
     let probTarjetas = (targetTarjetasCount / totalSims) * 100;
 
-    let avgRemates = (sumRemates / totalSims).toFixed(1);
-    let avgArco = Math.round(sumArco / totalSims);
-    let avgCorners = (sumCorners / totalSims).toFixed(1);
-    let avgTarjetas = (sumTarjetas / totalSims).toFixed(1);
+    // Promedios individuales formateados como rangos lógicos
+    let avgRemL = (sumRemL / totalSims);
+    let avgRemV = (sumRemV / totalSims);
+    let avgArcoL = (sumArcoL / totalSims);
+    let avgArcoV = (sumArcoV / totalSims);
+    let avgCorL = (sumCorL / totalSims);
+    let avgCorV = (sumCorV / totalSims);
+    let avgTarL = (sumTarL / totalSims);
+    let avgTarV = (sumTarV / totalSims);
 
     let bestH = Math.round(lambdaL);
     let bestA = Math.round(lambdaV);
@@ -355,10 +432,21 @@ function correrSimulacionMonteCarlo() {
 
     // Mostrar en Pantalla
     document.getElementById('resScore').innerText = `${bestH} - ${bestA} (Modelo Estocástico)`;
-    document.getElementById('resRematesTotales').innerText = `~${avgRemates} remates totales`;
-    document.getElementById('resRematesArco').innerText = `~${avgArco} tiros al arco`;
-    document.getElementById('resCorners').innerText = `~${avgCorners} córners promedio`;
-    document.getElementById('resTarjetas').innerText = `~${avgTarjetas} tarjetas promedio`;
+    
+    // Desgloses por equipo
+    document.getElementById('resRemLocal').innerText = `${Math.floor(avgRemL)} - ${Math.ceil(avgRemL + 1)} remates`;
+    document.getElementById('resRemVisita').innerText = `${Math.floor(avgRemV)} - ${Math.ceil(avgRemV + 1)} remates`;
+    
+    document.getElementById('resArcoLocal').innerText = `${Math.round(avgArcoL)} tiros al arco`;
+    document.getElementById('resArcoVisita').innerText = `${Math.round(avgArcoV)} tiros al arco`;
+    
+    document.getElementById('resCorLocal').innerText = `${Math.floor(avgCorL)} - ${Math.ceil(avgCorL + 1)} córners`;
+    document.getElementById('resCorVisita').innerText = `${Math.floor(avgCorV)} - ${Math.ceil(avgCorV + 1)} córners`;
+    
+    document.getElementById('resTarLocal').innerText = `${Math.round(avgTarL)} amarillas`;
+    document.getElementById('resTarVisita').innerText = `${Math.round(avgTarV)} amarillas`;
+
+    document.getElementById('resTotalesGlobales').innerText = `Remates Totales: ~${(avgRemL + avgRemV).toFixed(1)} | Córners: ~${(avgCorL + avgCorV).toFixed(1)} | Tarjetas: ~${(avgTarL + avgTarV).toFixed(1)}`;
 
     // Local Card
     document.getElementById('prob1').innerText = `${probL.toFixed(1)}% Probabilidad`;
