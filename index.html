@@ -3,355 +3,300 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Modelo Cuantitativo Realista</title>
+    <title>Apex Quant Pro - Sports Trading Terminal</title>
     <style>
         :root {
-            --bg-color: #0f172a;
-            --card-bg: #1e293b;
-            --text-color: #f8fafc;
-            --accent-local: #22c55e;
-            --accent-visitor: #3b82f6;
-            --border-color: #334155;
-            --yellow-card: #facc15;
-            --prob-color: #38bdf8;
+            --bg: #090d16;
+            --card: #131c31;
+            --border: #1e293b;
+            --accent: #38bdf8;
+            --green: #22c55e;
+            --red: #ef4444;
+            --yellow: #facc15;
+            --text: #f8fafc;
+            --muted: #94a3b8;
         }
         body {
             font-family: system-ui, -apple-system, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
+            background-color: var(--bg);
+            color: var(--text);
             margin: 0;
             padding: 15px;
         }
         .container {
-            max-width: 680px;
+            max-width: 700px;
             margin: 0 auto;
         }
-        h1 {
+        header {
             text-align: center;
-            font-size: 1.35rem;
             margin-bottom: 20px;
-            color: var(--prob-color);
+        }
+        header h1 {
+            font-size: 1.5rem;
+            margin: 0;
+            background: linear-gradient(135deg, #38bdf8, #818cf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        header p {
+            font-size: 0.8rem;
+            color: var(--muted);
+            margin: 5px 0 0 0;
         }
         .card {
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
+            background-color: var(--card);
+            border: 1px solid var(--border);
             border-radius: 12px;
             padding: 15px;
             margin-bottom: 15px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.5);
         }
         h3 {
             margin-top: 0;
-            font-size: 1.05rem;
-            border-bottom: 1px solid var(--border-color);
+            font-size: 1rem;
+            border-bottom: 1px solid var(--border);
             padding-bottom: 8px;
-            color: #e2e8f0;
+            color: var(--accent);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
-        .grid-inputs {
+        .grid-2 {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 12px;
-            margin-bottom: 10px;
         }
-        .team-column h4 {
+        .team-col h4 {
             margin: 0 0 8px 0;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             text-align: center;
-            padding: 4px;
+            padding: 5px;
             border-radius: 6px;
         }
-        .local-title { color: var(--accent-local); background: rgba(34, 197, 94, 0.1); }
-        .visitor-title { color: var(--accent-visitor); background: rgba(59, 130, 246, 0.1); }
+        .home-hdr { background: rgba(34, 197, 94, 0.1); color: var(--green); }
+        .away-hdr { background: rgba(59, 130, 246, 0.1); color: #60a5fa; }
         
         label {
             display: block;
-            font-size: 0.78rem;
-            color: #94a3b8;
-            margin-bottom: 2px;
+            font-size: 0.75rem;
+            color: var(--muted);
+            margin-bottom: 3px;
         }
-        input {
+        input, select {
             width: 100%;
             padding: 8px;
-            background-color: #0f172a;
-            border: 1px solid var(--border-color);
+            background-color: #090d16;
+            border: 1px solid var(--border);
             border-radius: 6px;
             color: white;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             box-sizing: border-box;
             margin-bottom: 8px;
             text-align: center;
         }
-        button {
+        .btn-exec {
             width: 100%;
             padding: 12px;
-            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            background: linear-gradient(135deg, #0284c7, #2563eb);
             color: white;
             border: none;
             border-radius: 8px;
             font-weight: bold;
             font-size: 1rem;
             cursor: pointer;
-            margin-top: 5px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+            transition: transform 0.1s;
         }
-        button:active {
-            transform: scale(0.98);
-        }
-        .results-section {
-            display: none;
-        }
-        .stat-row {
+        .btn-exec:active { transform: scale(0.98); }
+        
+        .results-section { display: none; }
+        .metric-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 9px 0;
-            border-bottom: 1px dashed var(--border-color);
-            font-size: 0.9rem;
+            padding: 8px 0;
+            border-bottom: 1px dashed var(--border);
+            font-size: 0.88rem;
         }
-        .stat-row:last-child {
-            border-bottom: none;
-        }
-        .highlight-val {
-            color: var(--prob-color);
+        .metric-row:last-child { border-bottom: none; }
+        .val-highlight { color: var(--accent); font-weight: bold; }
+        
+        .badge-value {
+            background: rgba(34, 197, 94, 0.15);
+            border: 1px solid var(--green);
+            color: var(--green);
+            padding: 4px 8px;
+            border-radius: 6px;
             font-weight: bold;
+            font-size: 0.8rem;
         }
-        .prob-badge {
-            background-color: #0f172a;
-            border: 1px solid var(--border-color);
-            padding: 2px 8px;
-            border-radius: 4px;
-            color: #4ade80;
+        .badge-warning {
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid var(--red);
+            color: var(--red);
+            padding: 4px 8px;
+            border-radius: 6px;
             font-weight: bold;
+            font-size: 0.8rem;
         }
-        .breakdown-box {
-            background-color: #0f172a;
-            padding: 12px;
-            border-radius: 8px;
-            font-size: 0.85rem;
-            line-height: 1.5;
+        .terminal-box {
+            background-color: #090d16;
+            border-left: 4px solid var(--accent);
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 0.82rem;
+            line-height: 1.4;
             color: #cbd5e1;
-            border-left: 4px solid var(--prob-color);
             margin-top: 10px;
-        }
-        .breakdown-box h4 {
-            margin: 0 0 6px 0;
-            color: #38bdf8;
-            font-size: 0.9rem;
-        }
-        .breakdown-item {
-            margin-bottom: 8px;
-        }
-        .breakdown-item:last-child {
-            margin-bottom: 0;
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>Analizador Cuantitativo Realista</h1>
+    <header>
+        <h1>APEX QUANT PRO</h1>
+        <p>Terminal Algorítmico de Apuestas Deportivas & Value Bets</p>
+    </header>
     
     <div class="card">
-        <h3>1. Ingresar Atributos de los Equipos</h3>
-        <div class="grid-inputs">
+        <h3>1. Matriz de Datos y Contexto</h3>
+        <div class="grid-2">
             <!-- Local -->
-            <div class="team-column">
-                <h4 class="local-title">Local (Verde)</h4>
-                <label>Rating General</label>
-                <input type="number" id="ratL" value="78">
-                <label>Ataque</label>
-                <input type="number" id="atkL" value="76">
-                <label>Mediocampo</label>
-                <input type="number" id="medL" value="75">
-                <label>Defensa</label>
-                <input type="number" id="defL" value="77">
-                <label>Porteros</label>
-                <input type="number" id="porL" value="76">
-                <label>Plantilla</label>
-                <input type="number" id="plaL" value="76">
+            <div class="team-col">
+                <h4 class="home-hdr">Equipo Local</h4>
+                <label>Ataque / xG Esperado (1-10)</label>
+                <input type="number" id="atkL" value="7.5" step="0.1" min="1" max="10">
+                <label>Defensa / xGA (1-10)</label>
+                <input type="number" id="defL" value="6.0" step="0.1" min="1" max="10">
+                <label>Estilo Táctico</label>
+                <select id="estL">
+                    <option value="bandas">Desborde / Centros (Córners+)</option>
+                    <option value="posesion" selected>Posesión / Control</option>
+                    <option value="directo">Contra / Bloque Bajo</option>
+                </select>
+                <label>Cuota Casa (1X2 Local)</label>
+                <input type="number" id="oddsL" value="2.10" step="0.01">
             </div>
             <!-- Visitante -->
-            <div class="team-column">
-                <h4 class="visitor-title">Visitante (Azul)</h4>
-                <label>Rating General</label>
-                <input type="number" id="ratV" value="77">
-                <label>Ataque</label>
-                <input type="number" id="atkV" value="75">
-                <label>Mediocampo</label>
-                <input type="number" id="medV" value="74">
-                <label>Defensa</label>
-                <input type="number" id="defV" value="76">
-                <label>Porteros</label>
-                <input type="number" id="porV" value="75">
-                <label>Plantilla</label>
-                <input type="number" id="plaV" value="75">
+            <div class="team-col">
+                <h4 class="away-hdr">Equipo Visitante</h4>
+                <label>Ataque / xG Esperado (1-10)</label>
+                <input type="number" id="atkV" value="6.0" step="0.1" min="1" max="10">
+                <label>Defensa / xGA (1-10)</label>
+                <input type="number" id="defV" value="6.5" step="0.1" min="1" max="10">
+                <label>Estilo Táctico</label>
+                <select id="estV">
+                    <option value="bandas">Desborde / Centros (Córners+)</option>
+                    <option value="posesion">Posesión / Control</option>
+                    <option value="directo" selected>Contra / Bloque Bajo</option>
+                </select>
+                <label>Cuota Casa (1X2 Visitante)</label>
+                <input type="number" id="oddsV" value="3.50" step="0.01">
             </div>
         </div>
-        <button onclick="analizarPartido()">Ejecutar Modelo Realista</button>
+        <button class="btn-exec" onclick="correrModeloPro()">EJECUTAR MOTOR CUANTITATIVO</button>
     </div>
 
     <div class="card results-section" id="resultsCard">
-        <h3>2. Proyección de Estadísticas Base</h3>
-        <div class="stat-row">
-            <span>Marcador Estimado (Local - Visitante):</span>
-            <span id="resMarcador" class="highlight-val" style="font-size: 1.1rem; color: #4ade80;">-</span>
+        <h3>2. Proyecciones Avanzadas de Mercado</h3>
+        <div class="metric-row">
+            <span>Marcador Algorítmico Base:</span>
+            <span id="resScore" class="val-highlight" style="font-size: 1.05rem; color: var(--green);">-</span>
         </div>
-        <div class="stat-row">
-            <span>Remates Totales (Local / Visitante):</span>
-            <span id="resRemTotales" class="highlight-val">-</span>
+        <div class="metric-row">
+            <span>Remates al Arco Combinados:</span>
+            <span id="resRemates" class="val-highlight">-</span>
         </div>
-        <div class="stat-row">
-            <span>Remates al Arco (Local / Visitante):</span>
-            <span id="resTirArco" class="highlight-val">-</span>
+        <div class="metric-row">
+            <span>Tiros de Esquina Totales:</span>
+            <span id="resCorners" class="val-highlight">-</span>
         </div>
-        <div class="stat-row">
-            <span>Tiros de Esquina (Córners Totales):</span>
-            <span id="resCorners" class="highlight-val">-</span>
-        </div>
-        <div class="stat-row">
-            <span>Tarjetas Amarillas (Local / Vis):</span>
-            <span id="resTarjetas" style="color: var(--yellow-card); font-weight: bold;">-</span>
+        <div class="metric-row">
+            <span>Índice de Fricción (Tarjetas):</span>
+            <span id="resTarjetas" class="val-highlight" style="color: var(--yellow);">-</span>
         </div>
 
-        <h3 style="margin-top: 15px;">3. Probabilidades Matemáticas (%)</h3>
-        <div class="stat-row">
-            <span>Victoria Local / Empate / Victoria Vis:</span>
-            <span id="res1X2" class="prob-badge">-</span>
+        <h3>3. 🧠 Auditoría de Valor (+EV) & Recomendación</h3>
+        <div class="metric-row">
+            <span>Análisis de Cuota Local:</span>
+            <span id="valAnalisisLocal">-</span>
         </div>
-        <div class="stat-row">
-            <span>Probabilidad Ambos Anotan (BTTS):</span>
-            <span id="resBTTS" class="highlight-val">-</span>
-        </div>
-        <div class="stat-row">
-            <span>Goles Más de (Over 1.5 / 2.5 / 3.5):</span>
-            <span id="resOver" class="highlight-val" style="font-size: 0.85rem;">-</span>
-        </div>
-
-        <h3 style="margin-top: 15px;">4. Justificación Táctica</h3>
-        <div class="breakdown-box" id="resDesglose"></div>
+        <div class="terminal-box" id="terminalLog"></div>
     </div>
 </div>
 
 <script>
-function factorial(n) {
-    if (n === 0 || n === 1) return 1;
-    let acc = 1;
-    for (let i = 2; i <= n; i++) acc *= i;
-    return acc;
-}
-
-function poissonProb(lambda, k) {
-    return (Math.pow(lambda, k) * Math.exp(-lambda)) / factorial(k);
-}
-
-function analizarPartido() {
+function correrModeloPro() {
     const atkL = parseFloat(document.getElementById('atkL').value);
     const defL = parseFloat(document.getElementById('defL').value);
-    const porL = parseFloat(document.getElementById('porL').value);
-    const medL = parseFloat(document.getElementById('medL').value);
-    const plaL = parseFloat(document.getElementById('plaL').value);
-    
+    const estL = document.getElementById('estL').value;
+    const oddsL = parseFloat(document.getElementById('oddsL').value);
+
     const atkV = parseFloat(document.getElementById('atkV').value);
     const defV = parseFloat(document.getElementById('defV').value);
-    const porV = parseFloat(document.getElementById('porV').value);
-    const medV = parseFloat(document.getElementById('medV').value);
-    const plaV = parseFloat(document.getElementById('plaV').value);
+    const estV = document.getElementById('estV').value;
+    const oddsV = parseFloat(document.getElementById('oddsV').value);
 
-    // --- MODELO MATEMÁTICO DE CALIBRACIÓN REALISTA ---
+    // --- CÁLCULO DE TASAS REALES ---
+    let golesL = Math.max(0.3, (atkL / defV) * 1.15);
+    let golesV = Math.max(0.3, (atkV / defL) * 0.90);
+
+    let estH = Math.round(golesL);
+    let estA = Math.round(golesV);
+    let totalGoles = estH + estA;
+
+    // Córners dinámicos por estilo de bandas
+    let baseCorners = 8.5;
+    if (estL === 'bandas') baseCorners += 2.0;
+    if (estV === 'bandas') baseCorners += 2.0;
+    if (estL === 'directo' && estV === 'directo') baseCorners -= 2.5;
+    baseCorners = Math.round(Math.max(6, Math.min(baseCorners, 13)));
+
+    // Remates al arco
+    let remates = Math.round(5 + (atkL + atkV) * 0.4);
+    remates = Math.max(3, Math.min(remates, 13));
+
+    // Tarjetas
+    let tarjetas = Math.round(3.2 + (Math.abs(atkL - atkV) > 2 ? 1.0 : 0) + (estL === 'directo' || estV === 'directo' ? 0.8 : 0));
+    tarjetas = Math.max(2, Math.min(tarjetas, 6));
+
+    // --- EVALUACIÓN DE VALUE BET (EV) ---
+    // Probabilidad implícita de la casa para el local: (1 / oddsL) * 100
+    let impliedProbL = (1 / oddsL) * 100;
     
-    // 1. Goles con Poisson equilibrado
-    let lambdaLocal = (atkL / defV) * 1.12; // Leve plus de localía
-    let lambdaVis = (atkV / defL) * 0.96;
-    lambdaLocal = Math.max(0.4, Math.min(lambdaLocal, 2.8));
-    lambdaVis = Math.max(0.4, Math.min(lambdaVis, 2.8));
+    // Nuestra probabilidad estimada basada en la superioridad de xG
+    let diffAtk = atkL - atkV;
+    let modelProbL = 45 + (diffAtk * 6) + (estL === 'posesion' ? 5 : 0);
+    modelProbL = Math.max(15, Math.min(modelProbL, 85));
 
-    let probHomeWin = 0, probDraw = 0, probAwayWin = 0, probBtts = 0;
-    let probTotalGoles = { o15: 0, o25: 0, o35: 0 };
-    let maxProb = -1, bestH = 0, bestA = 0;
+    let isValue = modelProbL > impliedProbL;
+    let badgeHtml = "";
 
-    for (let h = 0; h <= 5; h++) {
-        for (let a = 0; a <= 5; a++) {
-            let p = poissonProb(lambdaLocal, h) * poissonProb(lambdaVis, a);
-            if (h > a) probHomeWin += p;
-            else if (h === a) probDraw += p;
-            else probAwayWin += p;
-
-            if (h > 0 && a > 0) probBtts += p;
-            if (h + a > 1.5) probTotalGoles.o15 += p;
-            if (h + a > 2.5) probTotalGoles.o25 += p;
-            if (h + a > 3.5) probTotalGoles.o35 += p;
-
-            if (p > maxProb) {
-                maxProb = p;
-                bestH = h;
-                bestA = a;
-            }
-        }
+    if (isValue) {
+        badgeHtml = `<span class="badge-value">¡VALUE DETECTADO (+EV)! (Modelo: ${modelProbL.toFixed(0)}% vs Casa: ${impliedProbL.toFixed(0)}%)</span>`;
+    } else {
+        badgeHtml = `<span class="badge-warning">SIN VALOR (Cuota Trampa / Margen Ajustado)</span>`;
     }
 
-    // 2. Remates Totales (Rango natural de liga: 11 a 16 combinados)
-    // Se calcula base media de 6.5 por equipo y se ajusta con el ataque y control del mediocampo
-    let diffMed = (medL - medV) / 10; // Positivo si domina local, negativo si visitante
-    
-    let remTotLocal = Math.round(6.5 + (atkL - 75) * 0.2 + diffMed * 1.5);
-    let remTotVis = Math.round(6.5 + (atkV - 75) * 0.2 - diffMed * 1.5);
-    
-    remTotLocal = Math.max(5, Math.min(remTotLocal, 13));
-    remTotVis = Math.max(5, Math.min(remTotVis, 13));
-
-    // 3. Remates al Arco (Proporción realista del 35% al 42% de los remates totales)
-    // Si el portero rival es flojo (<75), aumenta el porcentaje de acierto a puerta
-    let efecLocal = 0.38 + Math.max(0, (75 - porV) / 100);
-    let efecVis = 0.38 + Math.max(0, (75 - porL) / 100);
-
-    let tirArcoLocal = Math.round(remTotLocal * efecLocal);
-    let tirArcoVis = Math.round(remTotVis * efecVis);
-    
-    tirArcoLocal = Math.max(2, Math.min(tirArcoLocal, 7));
-    tirArcoVis = Math.max(2, Math.min(tirArcoVis, 7));
-
-    // 4. Tiros de Esquina (Rango natural: 8 a 12 totales)
-    let corLocal = Math.round(4.5 + diffMed * 1.2 + (defV - 75) * 0.05);
-    let corVis = Math.round(4.5 - diffMed * 1.2 + (defL - 75) * 0.05);
-    
-    corLocal = Math.max(2, Math.min(corLocal, 7));
-    corVis = Math.max(2, Math.min(corVis, 7));
-    let totalCorners = corLocal + corVis;
-
-    // 5. Tarjetas Amarillas (Rango natural: 3 a 6 totales)
-    let diffPlantilla = Math.abs(plaL - plaV);
-    let tarLocal = Math.round(1.8 + (diffPlantilla > 4 ? 0.8 : 0) + (atkV - defL > 2 ? 0.5 : 0));
-    let tarVis = Math.round(1.8 + (diffPlantilla > 4 ? 0.8 : 0) + (atkL - defV > 2 ? 0.5 : 0));
-    
-    tarLocal = Math.max(1, Math.min(tarLocal, 4));
-    tarVis = Math.max(1, Math.min(tarVis, 4));
-    let totalTarjetas = tarLocal + tarVis;
-
     // Mostrar en Pantalla
-    document.getElementById('resMarcador').innerText = `${bestH} - ${bestA}  (Tasas: ${lambdaLocal.toFixed(2)} - ${lambdaVis.toFixed(2)})`;
-    document.getElementById('resRemTotales').innerText = `${remTotLocal} vs ${remTotVis} (Total: ~${remTotLocal + remTotVis})`;
-    document.getElementById('resTirArco').innerText = `${tirArcoLocal} vs ${tirArcoVis} (Total: ~${tirArcoLocal + tirArcoVis})`;
-    document.getElementById('resCorners').innerText = `${corLocal} a ${corVis} (Total: ~${totalCorners})`;
-    document.getElementById('resTarjetas').innerText = `${tarLocal} vs ${tarVis} (Total: ~${totalTarjetas})`;
+    document.getElementById('resScore').innerText = `${estH} - ${estA} (Goles Totales: ~${totalGoles})`;
+    document.getElementById('resRemates').innerText = `~${remates} tiros directos a puerta`;
+    document.getElementById('resCorners').innerText = `~${baseCorners} saques de esquina`;
+    document.getElementById('resTarjetas').innerText = `~${tarjetas} amonestaciones`;
 
-    document.getElementById('res1X2').innerText = `${(probHomeWin*100).toFixed(1)}% | ${(probDraw*100).toFixed(1)}% | ${(probAwayWin*100).toFixed(1)}%`;
-    document.getElementById('resBTTS').innerText = `${(probBtts*100).toFixed(1)}%`;
-    document.getElementById('resOver').innerText = `+1.5: ${(probTotalGoles.o15*100).toFixed(1)}% | +2.5: ${(probTotalGoles.o25*100).toFixed(1)}% | +3.5: ${(probTotalGoles.o35*100).toFixed(1)}%`;
+    document.getElementById('valAnalisisLocal').innerHTML = badgeHtml;
 
-    // Desglose Táctico
-    document.getElementById('resDesglose').innerHTML = `
-        <div class="breakdown-item">
-            <h4>⚽ Lectura del Marcador:</h4>
-            Resultado más probable: <b>${bestH} - ${bestA}</b>. El cruce directo de ataque y defensa mantiene la coherencia de goles esperados sin subestimar partidos equilibrados.
-        </div>
-        <div class="breakdown-item">
-            <h4>🎯 Control de Remates:</h4>
-            Proyección de <b>${remTotLocal + remTotVis} remates totales</b> y <b>${tirArcoLocal + tirArcoVis} al arco</b>. Los valores se ubican en el rango estándar del fútbol profesional (partidos normales con buena fluidez).
-        </div>
-        <div class="breakdown-item">
-            <h4>🚩 Córners y Tarjetas:</h4>
-            Se calculan <b>${totalCorners} córners</b> y <b>${totalTarjetas} tarjetas</b>, reflejando de forma natural el dominio de la zona medular y la fricción por diferencias de plantilla.
-        </div>
+    // Reporte de Terminal IA
+    let recomendacionMercado = totalGoles >= 3 ? "Más de 1.5 Goles / BTTS Recomendado." : "Bajas de Goles o Partido Cerrado.";
+    let recomendacionCorners = baseCorners >= 10 ? `Línea alta de Córners (Buscar +8.5)` : `Línea baja de Córners (Evitar overs altos)`;
+
+    document.getElementById('terminalLog').innerHTML = `
+        <b>📊 Diagnóstico Táctico Apex Quant:</b><br>
+        • <b>Tendencia de Goles:</b> ${recomendacionMercado}<br>
+        • <b>Tendencia de Córners:</b> ${recomendacionCorners}<br>
+        • <b>Nivel de Fricción:</b> ${tarjetas >= 4.5 ? "Alta probabilidad de partido caliente (Tarjetas+)." : "Partido limpio / controlado."}<br>
+        • <i>Conclusión Financiera:</i> ${isValue ? "El mercado subestima al local según nuestros coeficientes de xG. Apuesta viable." : "El precio de la cuota no compensa el riesgo estadístico. Es mejor pasar."}
     `;
 
     document.getElementById('resultsCard').style.display = 'block';
