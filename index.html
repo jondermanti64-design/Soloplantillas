@@ -164,7 +164,7 @@
     </header>
     
     <div class="card">
-        <h3>1. Matriz de Parámetros & Líneas de la Casa</h3>
+        <h3>1. Matriz de Parámetros & Cuotas (1X2)</h3>
         <div class="grid-2">
             <!-- Local -->
             <div class="team-col">
@@ -179,7 +179,7 @@
                     <option value="posesion" selected>Posesión / Control</option>
                     <option value="directo">Contra / Bloque Bajo</option>
                 </select>
-                <label>Cuota Casa (1X2 Local)</label>
+                <label>Cuota Casa (Victoria Local)</label>
                 <input type="number" id="odds1X2" value="2.05" step="0.01">
             </div>
             <!-- Visitante -->
@@ -195,12 +195,13 @@
                     <option value="posesion">Posesión / Control</option>
                     <option value="directo" selected>Contra / Bloque Bajo</option>
                 </select>
-                <label style="color:transparent;">Spacer</label>
-                <input type="hidden" value="0">
+                <label>Cuota Casa (Victoria Visitante)</label>
+                <input type="number" id="odds2" value="3.50" step="0.01">
             </div>
         </div>
 
-        <div style="margin-top: 8px; border-top: 1px dashed var(--border); padding-top: 8px;">
+        <h3>2. Líneas Secundarias de la Casa</h3>
+        <div style="margin-top: 4px;">
             <div class="grid-2">
                 <div>
                     <label>Línea Remates Totales (Ej: 24.5)</label>
@@ -216,17 +217,14 @@
                     <label>Línea Tarjetas (Ej: 4.5)</label>
                     <input type="number" id="lineaTarjetas" value="4.5" step="0.5">
                 </div>
-                <div>
-                    <!-- Espacio libre simétrico -->
-                </div>
             </div>
         </div>
 
-        <button class="btn-exec" onclick="correrSimulacionMonteCarlo()">EJECUTAR 10,000 SIMULACIONES</button>
+        <button class="btn-exec" style="margin-top: 10px;" onclick="correrSimulacionMonteCarlo()">EJECUTAR 10,000 SIMULACIONES</button>
     </div>
 
     <div class="card results-section" id="resultsCard">
-        <h3>2. Resultados Estadísticos (Simulación Monte Carlo)</h3>
+        <h3>3. Resultados Estadísticos (Simulación Monte Carlo)</h3>
         <div class="prob-row">
             <span>Marcador Promedio Más Frecuente:</span>
             <span id="resScore" class="val-highlight" style="color: var(--green);">-</span>
@@ -248,11 +246,16 @@
             <span id="resTarjetas" class="val-highlight" style="color: var(--yellow);">-</span>
         </div>
 
-        <h3>3. 🎲 Matriz de Probabilidades & Auditoría de Valor (+EV)</h3>
+        <h3>4. 🎲 Matriz de Probabilidades & Auditoría de Valor (+EV)</h3>
         
         <div class="market-box">
-            <h4><span>Victoria Local (1X2)</span> <span id="prob1X2" style="color:var(--accent)">-</span></h4>
-            <div id="val1X2Txt"></div>
+            <h4><span>Victoria Local (1)</span> <span id="prob1" style="color:var(--accent)">-</span></h4>
+            <div id="val1Txt"></div>
+        </div>
+
+        <div class="market-box">
+            <h4><span>Victoria Visitante (2)</span> <span id="prob2" style="color:var(--accent)">-</span></h4>
+            <div id="val2Txt"></div>
         </div>
 
         <div class="market-box">
@@ -274,18 +277,19 @@
 
 <script>
 function correrSimulacionMonteCarlo() {
-    const atkL = parseFloat(document.getElementById('atkL').value);
-    const defL = parseFloat(document.getElementById('defL').value);
+    const atkL = parseFloat(document.getElementById('atkL').value) || 5;
+    const defL = parseFloat(document.getElementById('defL').value) || 5;
     const estL = document.getElementById('estL').value;
-    const odds1X2 = parseFloat(document.getElementById('odds1X2').value);
+    const odds1 = parseFloat(document.getElementById('odds1X2').value) || 2.0;
 
-    const atkV = parseFloat(document.getElementById('atkV').value);
-    const defV = parseFloat(document.getElementById('defV').value);
+    const atkV = parseFloat(document.getElementById('atkV').value) || 5;
+    const defV = parseFloat(document.getElementById('defV').value) || 5;
     const estV = document.getElementById('estV').value;
+    const odds2 = parseFloat(document.getElementById('odds2').value) || 3.0;
 
-    const lineaRemates = parseFloat(document.getElementById('lineaRemates').value);
-    const lineaCorners = parseFloat(document.getElementById('lineaCorners').value);
-    const lineaTarjetas = parseFloat(document.getElementById('lineaTarjetas').value);
+    const lineaRemates = parseFloat(document.getElementById('lineaRemates').value) || 24.5;
+    const lineaCorners = parseFloat(document.getElementById('lineaCorners').value) || 9.5;
+    const lineaTarjetas = parseFloat(document.getElementById('lineaTarjetas').value) || 4.5;
 
     let lambdaL = Math.max(0.4, (atkL / defV) * 1.12);
     let lambdaV = Math.max(0.4, (atkV / defL) * 0.92);
@@ -330,6 +334,7 @@ function correrSimulacionMonteCarlo() {
     }
 
     let probL = (winsL / totalSims) * 100;
+    let probV = (winsV / totalSims) * 100;
     let probRemates = (targetRematesCount / totalSims) * 100;
     let probCorners = (targetCornersCount / totalSims) * 100;
     let probTarjetas = (targetTarjetasCount / totalSims) * 100;
@@ -342,8 +347,11 @@ function correrSimulacionMonteCarlo() {
     let bestH = Math.round(lambdaL);
     let bestA = Math.round(lambdaV);
 
-    let implied1X2 = (1 / odds1X2) * 100;
-    let isValue1X2 = probL > implied1X2;
+    let implied1 = (1 / odds1) * 100;
+    let isValue1 = probL > implied1;
+
+    let implied2 = (1 / odds2) * 100;
+    let isValue2 = probV > implied2;
 
     // Mostrar en Pantalla
     document.getElementById('resScore').innerText = `${bestH} - ${bestA} (Modelo Estocástico)`;
@@ -352,11 +360,17 @@ function correrSimulacionMonteCarlo() {
     document.getElementById('resCorners').innerText = `~${avgCorners} córners promedio`;
     document.getElementById('resTarjetas').innerText = `~${avgTarjetas} tarjetas promedio`;
 
-    // 1X2 Card
-    document.getElementById('prob1X2').innerText = `${probL.toFixed(1)}% Probabilidad`;
-    document.getElementById('val1X2Txt').innerHTML = isValue1X2 ?
-        `<span class="badge-value">¡VALUE BET DETECTADO! (+EV)</span> Cuota implícita: ${implied1X2.toFixed(1)}% (Cuota: ${odds1X2}).` :
-        `<span class="badge-warning">SIN VALOR MATEMÁTICO</span> Cuota implícita: ${implied1X2.toFixed(1)}%.`;
+    // Local Card
+    document.getElementById('prob1').innerText = `${probL.toFixed(1)}% Probabilidad`;
+    document.getElementById('val1Txt').innerHTML = isValue1 ?
+        `<span class="badge-value">¡VALUE BET DETECTADO! (+EV)</span> Cuota implícita: ${implied1.toFixed(1)}% (Cuota: ${odds1}).` :
+        `<span class="badge-warning">SIN VALOR MATEMÁTICO</span> Cuota implícita: ${implied1.toFixed(1)}%.`;
+
+    // Visitante Card
+    document.getElementById('prob2').innerText = `${probV.toFixed(1)}% Probabilidad`;
+    document.getElementById('val2Txt').innerHTML = isValue2 ?
+        `<span class="badge-value">¡VALUE BET DETECTADO! (+EV)</span> Cuota implícita: ${implied2.toFixed(1)}% (Cuota: ${odds2}).` :
+        `<span class="badge-warning">SIN VALOR MATEMÁTICO</span> Cuota implícita: ${implied2.toFixed(1)}%.`;
 
     // Remates Card
     document.getElementById('probRemates').innerText = `${probRemates.toFixed(1)}% Probabilidad Over ${lineaRemates}`;
